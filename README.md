@@ -58,8 +58,8 @@ This repository contains the complete implementation, scientific replication, an
 ### 1. Installation
 Clone the repository and install required dependencies:
 ```bash
-git clone https://github.com/ShubhagamanSingh/setelite_work.git
-cd setelite_work
+git clone https://github.com/ShubhagamanSingh/satellite_work.git
+cd satellite_work
 pip install numpy pandas scipy scikit-learn xgboost lightgbm h5py matplotlib seaborn requests python-docx
 ```
 
