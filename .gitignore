@@ -1,0 +1,15 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Large model artifacts exceeding GitHub 100 MB limit
+# Note: Standalone Random Forest is 376 MB as discussed in the paper.
+# The core GBR (138 KB) and Stacking Super Learner (31 MB) are tracked.
+models/random_forest.joblib
+
+# OS / Editor artifacts
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
