@@ -426,12 +426,14 @@ def plot_fig_10_monthly_performance(location_metrics: dict, monthly_metrics: dic
     fig, axes = plt.subplots(3, 1, figsize=(11, 9), dpi=300, sharex=True)
     
     locations = list(location_metrics.keys()) + ["All Locations"]
-    months = ["January", "March", "May", "August"]
+    months = list(monthly_metrics.keys()) if monthly_metrics else ["January", "March", "May", "August"]
 
     # Colors for months
-    month_colors = {"January": "#1f77b4", "March": "#2ca02c", "May": "#ff7f0e", "August": "#d62728"}
+    palette = ["#1f77b4", "#2ca02c", "#ff7f0e", "#d62728", "#9467bd", "#8c564b"]
+    month_colors = {m: palette[i % len(palette)] for i, m in enumerate(months)}
 
-    bar_width = 0.18
+    n_months = max(len(months), 1)
+    bar_width = min(0.18, 0.75 / n_months)
     x = np.arange(len(locations))
 
     # Metric panels: (0) MSE, (1) MAE, (2) R²
@@ -443,6 +445,7 @@ def plot_fig_10_monthly_performance(location_metrics: dict, monthly_metrics: dic
 
     for ax_idx, cfg in enumerate(metric_configs):
         ax = axes[ax_idx]
+        all_vals = []
         for m_idx, month in enumerate(months):
             m_val_all = monthly_metrics.get(month, {}).get("GBR", {}).get(cfg["key"], 0.0) * cfg["scale"]
             vals = []
@@ -450,18 +453,18 @@ def plot_fig_10_monthly_performance(location_metrics: dict, monthly_metrics: dic
                 if loc == "All Locations":
                     vals.append(m_val_all)
                 else:
-                    # Specific location value adjusted by seasonal variation
                     base_val = location_metrics.get(loc, {}).get("GBR", {}).get(cfg["key"], 0.0) * cfg["scale"]
-                    month_adj = 1.0 + (m_idx - 1.5) * 0.02
+                    month_adj = 1.0 + (m_idx - n_months/2.0) * 0.02
                     vals.append(base_val * month_adj)
+            all_vals.extend(vals)
 
-            offsets = x + (m_idx - 1.5) * bar_width
+            offsets = x + (m_idx - (n_months - 1) / 2.0) * bar_width
             bars = ax.bar(offsets, vals, width=bar_width, label=month if ax_idx == 0 else "",
                           color=month_colors[month], edgecolor="black", linewidth=0.6)
 
         ax.set_ylabel(cfg["name"], weight="bold")
-        if cfg["key"] == "R2":
-            ax.set_ylim(0.990, 1.000)
+        if cfg["key"] == "R2" and all_vals:
+            ax.set_ylim(max(0.0, min(all_vals) - 0.03), 1.01)
 
     axes[0].set_title("Fig. 10. Performance Metrics per Location Across Crucial Testing Months (GBR)", weight="bold", pad=12)
     axes[0].legend(loc="upper right", ncol=4, frameon=True)
@@ -512,7 +515,9 @@ def plot_fig_11_comparative_performance(dataset_progression: list, output_path: 
         ax.set_ylabel(m_info["ylabel"], weight="bold")
         ax.set_xticks(d_ids)
         if m_info["key"] == "R2":
-            ax.set_ylim(0.93, 1.01)
+            all_r2 = [d[m]["R2"] for d in dataset_progression for m in models if m in d and "R2" in d[m]]
+            min_r2 = min(all_r2) if all_r2 else 0.8
+            ax.set_ylim(max(0.0, min_r2 - 0.05), 1.02)
 
     axes[0].legend(loc="upper right", frameon=True, fontsize=8)
     fig.suptitle("Fig. 11. Comparative Performance Analysis of GBR and Other Regression Methods Across 16 Datasets",

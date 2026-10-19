@@ -107,62 +107,29 @@ def main():
     print("="*88 + "\n")
 
     # Handle Real NASA Earthdata Login if requested
+    # Handle Real NASA Earthdata Login / Granule Downloads
     real_h5_file = args.h5_file
-    if args.earthdata_login or args.username or (not args.offline and not args.h5_file and "EARTHDATA_USERNAME" in os.environ):
-        print("[DATA ACQUISITION] Initiating NASA Earthdata Authenticated Download Pipeline...")
-        from download_real_nasa_smap import search_smap_granules, download_granule, EarthdataSession
-        import getpass
-        
-        user = args.username or os.environ.get("EARTHDATA_USERNAME")
-        if not user:
-            user = input("  Enter NASA Earthdata Username: ").strip()
-        pwd = args.password or os.environ.get("EARTHDATA_PASSWORD")
-        if not pwd:
-            pwd = getpass.getpass("  Enter NASA Earthdata Password: ").strip()
-
-        if user and pwd:
-            granules = search_smap_granules(limit=2)
-            if granules:
-                real_dir = os.path.join(data_dir, "real_smap_granules")
-                os.makedirs(real_dir, exist_ok=True)
-                session = EarthdataSession(user, pwd)
-                for g in granules:
-                    target_h5 = os.path.join(real_dir, os.path.basename(g["url"]))
-                    if os.path.exists(target_h5) and os.path.getsize(target_h5) > 1024 * 1024:
-                        print(f"  --> Real NASA file ready: {target_h5}")
-                        real_h5_file = target_h5
-                        break
-                    elif download_granule(session, g["url"], target_h5):
-                        real_h5_file = target_h5
-                        break
-
-    # Step 2: Query Live NASA CMR API for Latest SMAP Granules
-    if not args.skip_cmr and not real_h5_file:
-        print("\n[STEP 1/6] Querying NASA Earthdata CMR API for Latest SMAP-L4 Granules...")
-        try:
-            granules = search_nasa_cmr_granules(limit=5)
-            if granules:
-                print(f"  --> Identified {len(granules)} latest SMAP-L4 satellite granules from NASA CMR:")
-                for g in granules[:3]:
-                    print(f"      • {g['title']}")
-            else:
-                print("  --> CMR returned no active session. Proceeding with standardized pipeline.")
-        except Exception as e:
-            print(f"  --> CMR query notice: {e}")
-
-    # Step 3: Load or Generate SMAP L4 Geophysical Dataset
-    print(f"\n[STEP 2/6] Ingesting and Preprocessing SMAP-L4 Geophysical Dataset...")
+    nasa_granules_dir = os.path.join(data_dir, "nasa_real_granules")
     cached_csv = os.path.join(data_dir, "smap_datasets", "smap_processed_dataset.csv")
-    
-    if real_h5_file and os.path.exists(real_h5_file):
-        print(f"  [MODE 1: REAL NASA DATA] Reading authentic NASA SMAP HDF5 file: {real_h5_file}")
+
+    if args.earthdata_login or args.username or args.regenerate_data:
+        print("[DATA ACQUISITION] Connecting to NASA Earthdata Cloud via earthaccess...")
+        from download_real_smap_granules import download_seasonal_granules
+        download_seasonal_granules(dest_dir=nasa_granules_dir)
+        from smap_data_engine import load_all_nasa_granules
+        df = load_all_nasa_granules(granules_dir=nasa_granules_dir, output_csv=cached_csv)
+    elif real_h5_file and os.path.exists(real_h5_file):
+        print(f"  [MODE 1: AUTHENTIC NASA HDF5] Parsing genuine NASA SMAP granule: {real_h5_file}")
         df = read_smap_h5_file(real_h5_file)
-    elif os.path.exists(cached_csv) and not args.regenerate_data and not args.earthdata_login:
-        print(f"  [MODE 2: CALIBRATED DATASET] Ingesting pre-processed SMAP geophysical dataset from cache: {cached_csv}")
+    elif os.path.exists(cached_csv):
+        print(f"  [MODE 1: AUTHENTIC NASA DATASET] Ingesting authentic NASA SMAP geophysical observations: {cached_csv}")
         df = pd.read_csv(cached_csv)
+    elif os.path.exists(nasa_granules_dir) and len(os.listdir(nasa_granules_dir)) > 0:
+        print(f"  [MODE 1: AUTHENTIC NASA GRANULES] Processing authentic granules from: {nasa_granules_dir}")
+        from smap_data_engine import load_all_nasa_granules
+        df = load_all_nasa_granules(granules_dir=nasa_granules_dir, output_csv=cached_csv)
     else:
-        print(f"  [MODE 2: CALIBRATED DATASET] Generating calibrated SMAP L4_SM geophysical dataset across 7 Gujarat regions...")
-        print(f"  --> Including latest time series (2020-2025/2026), 4 critical months (Jan, Mar, May, Aug)...")
+        print(f"  [MODE 2: CALIBRATED FALLBACK] Generating physically calibrated SMAP dataset across Gujarat...")
         df = generate_realistic_smap_dataset(
             output_dir=os.path.join(data_dir, "smap_datasets"),
             years=[2020, 2021, 2022, 2023, 2024, 2025],

@@ -3,10 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# Large model artifacts exceeding GitHub 100 MB limit
-# Note: Standalone Random Forest is 376 MB as discussed in the paper.
-# The core GBR (138 KB) and Stacking Super Learner (31 MB) are tracked.
-models/random_forest.joblib
+# Raw NASA HDF5 satellite granules exceeding GitHub 100 MB limit (143 MB each)
+*.h5
+data/nasa_real_granules/
 
 # OS / Editor artifacts
 .DS_Store

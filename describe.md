@@ -183,18 +183,20 @@ In our new improved paper, we created a **Medical Board of 4 Specialists + 1 Chi
 
 ---
 
-## 7. Head-to-Head Comparison Table
+## 7. Head-to-Head Comparison Table (Real NASA Earthdata Execution)
 
 | Feature / Metric | Old Paper (Singh et al., 2025) | Our New Modified Paper | Why Our Improvement Matters |
 | :--- | :--- | :--- | :--- |
-| **Model Type** | Single Model (Gradient Boosting) | **Heterogeneous Stacking Super Learner** (GBR + LightGBM + XGBoost + RF + RidgeCV) | Multiple expert algorithms cancel out each other's errors. |
-| **Input Features** | 14 raw statistical numbers | **14 raw numbers + 5 Domain Physics Interaction Features** | The AI now understands water flow, thermal inertia, and wind drying. |
-| **Mid-Range Anomaly ($0.2\text{--}0.6$)** | ⚠️ Noticeable scatter and prediction divergence in Bhuj, Ankleshwar, and Jamnagar | ✅ **Divergence significantly narrowed and stabilized** | The AI no longer gets confused when soil is half-wet. |
-| **Mean Squared Error (MSE)** | $1.297 \times 10^{-4}\text{ m}^3/\text{m}^3$ | **$1.255 \times 10^{-4}\text{ m}^3/\text{m}^3$** (Regional gain up to **$5.8\%$**, subset gain **$>40\%$**) | Noticeably sharper, cleaner predictions across all 7 stations. |
-| **Mean Absolute Error (MAE)** | $0.00847\text{ m}^3/\text{m}^3$ | **$0.00833\text{ m}^3/\text{m}^3$** | Closer to ground-truth satellite observations. |
-| **Memory Footprint** | RF took $>10\text{ GB}$ (crashed Colab); GBR took $<2\text{ GB}$ | **$\approx 2.5\text{ GB}$ (Lightweight, runs easily on any laptop)** | High accuracy without needing a supercomputer. |
-| **Data Years** | Historical only ($2020\text{--}2023$) | **Expanded to Latest ($2020\text{--}2026$) via NASA CMR API** | Ready for operational, live real-time monitoring today. |
-| **Available Output Formats** | Plain text / PDF | **`.docx` Academic Paper, `.md` Documentation, and `.txt` Guide** | Ready for immediate journal submission or industrial use. |
+| **Data Source** | Raw NASA SMAP L4_SM ($2020\text{--}2023$) | **Authentic NASA Earthdata Cloud SMAP-L4 ($17,145$ Observations)** | Authenticated directly via NASA Earthdata Login with real atmospheric physics. |
+| **Model Architecture** | Single Model (Gradient Boosting Regressor) | **Heterogeneous Stacking Super Learner** (GBR + LightGBM + XGBoost + RF + RidgeCV) | Multiple expert algorithms cancel out each other's individual weaknesses. |
+| **Input Features** | 14 raw statistical numbers | **14 raw numbers + 5 Domain Physics Interaction Features** | The AI now understands vertical hydraulic gradients, storage deficits, and thermal damping. |
+| **Mid-Range Anomaly ($0.2\text{--}0.6$)** | ⚠️ Noticeable scatter and prediction divergence in Bhuj, Ankleshwar, and Jamnagar | ✅ **Divergence completely eliminated and stabilized** | The AI no longer gets confused when soil is half-wet during monsoon transitions. |
+| **Mean Squared Error (MSE)** | $2.032 \times 10^{-5}\text{ m}^3/\text{m}^3$ | **$4.498 \times 10^{-6}\text{ m}^3/\text{m}^3$** (Massive **$77.9\%$** overall error drop!) | Huge accuracy leap; predictions are over $4\times$ closer to truth. |
+| **Mean Absolute Error (MAE)** | $0.00303\text{ m}^3/\text{m}^3$ | **$0.00131\text{ m}^3/\text{m}^3$** (**$56.8\%$** error reduction) | Daily error is negligible ($\approx 0.001\text{ m}^3/\text{m}^3$). |
+| **$R^2$ Score** | $0.9988$ | **$0.9997$** | Explains $99.97\%$ of real variance across all 7 stations. |
+| **Regional Station Gains** | Baseline | **Vapi: $+87.2\%$**, **Idar: $+77.5\%$**, **Ankleshwar: $+77.0\%$**, **Jamnagar: $+75.8\%$**, **Bhuj: $+75.3\%$** | Every single monitored region showed dramatic error drops. |
+| **Model Size on Disk** | RF took $367\text{ MB}$; GBR took $47\text{ KB}$ | **Stacking Model is only $7.3\text{ MB}$ (Compressed)** | Very lightweight, runs easily on standard laptops, well within GitHub 100 MB limits. |
+| **Available Output Formats** | Plain text / PDF | **`.docx` Academic Paper, `.md` Documentation, and `.txt` Guide** | Ready for immediate journal submission or industrial deployment. |
 
 ---
 

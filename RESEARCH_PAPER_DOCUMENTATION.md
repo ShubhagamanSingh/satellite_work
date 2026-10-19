@@ -215,15 +215,15 @@ Given training set $\mathcal{D} = \{(x_i, y_i)\}_{i=1}^N$:
 ## 5. Quantitative Benchmarks & Results Analysis
 
 ### 5.1 Overall Benchmark Across Machine Learning Models
-Evaluated on an $80:20$ train-test split across $55,944$ multi-seasonal samples:
+Evaluated on an $80:20$ train-test split across $17,145$ authentic NASA SMAP Level-4 observations:
 
-| Model Architecture | MSE ($\text{m}^3/\text{m}^3$) | MAE ($\text{m}^3/\text{m}^3$) | $R^2$ Score | RAM Footprint | Execution Speed |
+| Model Architecture | MSE ($\text{m}^3/\text{m}^3$) | MAE ($\text{m}^3/\text{m}^3$) | $R^2$ Score | Model Size | Execution Notes |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| **Linear Regression** | $2.43768 \times 10^{-4}$ | $0.01208$ | $0.9935$ | $< 50\text{ MB}$ | $< 0.1\text{ s}$ |
-| **Lasso Regression (LassoCV)** | $7.06751 \times 10^{-4}$ | $0.01788$ | $0.9811$ | $< 50\text{ MB}$ | $0.4\text{ s}$ |
-| **Random Forest Regressor** | $1.31042 \times 10^{-4}$ | $0.00847$ | $0.9965$ | $> 10\text{ GB}$ (file: $376\text{ MB}$) | $38.5\text{ s}$ |
-| **Gradient Boosting (Paper Baseline)** | $1.29721 \times 10^{-4}$ | $0.00847$ | $0.9965$ | $< 2\text{ GB}$ (file: $138\text{ KB}$) | $28.2\text{ s}$ |
-| **Enhanced Stacking Super Learner** | **$1.25500 \times 10^{-4}$** | **$0.00833$** | **$0.9966$** | $\approx 2.5\text{ GB}$ (file: $31\text{ MB}$) | $88.5\text{ s}$ |
+| **Linear Regression** | $2.00458 \times 10^{-5}$ | $0.00322$ | $0.9988$ | $< 1\text{ KB}$ | High speed; limited to linear combinations |
+| **Lasso Regression (LassoCV)** | $1.21498 \times 10^{-3}$ | $0.02561$ | $0.9293$ | $5.6\text{ KB}$ | Heavy L1 sparsity penalty |
+| **Random Forest Regressor** | $8.32912 \times 10^{-6}$ | $0.00130$ | $0.9995$ | $28.1\text{ MB}$ (compressed) | Strong baseline; heavy tree depth |
+| **Gradient Boosting (Paper Baseline)** | $2.03237 \times 10^{-5}$ | $0.00303$ | $0.9988$ | $47.0\text{ KB}$ | Fast; prone to mid-range divergence |
+| **Enhanced Stacking Super Learner** | **$4.49845 \times 10^{-6}$** | **$0.00131$** | **$0.9997$** | $7.3\text{ MB}$ (compressed) | **77.9% Error Reduction; eliminates divergence** |
 
 ### 5.2 Station-by-Station Improvement Matrix
 Performance across all seven Gujarat monitoring stations:

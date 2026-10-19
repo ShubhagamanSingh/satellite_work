@@ -203,12 +203,12 @@ def train_and_evaluate_all_models(
         "Enhanced Stacking Ensemble": calc_metrics(y_test, pred_stacking)
     }
 
-    # Save models
-    joblib.dump(lr, os.path.join(output_dir, "linear_regression.joblib"))
-    joblib.dump(lasso, os.path.join(output_dir, "lasso.joblib"))
-    joblib.dump(rf, os.path.join(output_dir, "random_forest.joblib"))
-    joblib.dump(gbr, os.path.join(output_dir, "gradient_boosting.joblib"))
-    joblib.dump(stacking_model, os.path.join(output_dir, "enhanced_stacking_ensemble.joblib"))
+    # Save models with compression to stay well under GitHub 100MB limit
+    joblib.dump(lr, os.path.join(output_dir, "linear_regression.joblib"), compress=3)
+    joblib.dump(lasso, os.path.join(output_dir, "lasso.joblib"), compress=3)
+    joblib.dump(rf, os.path.join(output_dir, "random_forest.joblib"), compress=3)
+    joblib.dump(gbr, os.path.join(output_dir, "gradient_boosting.joblib"), compress=3)
+    joblib.dump(stacking_model, os.path.join(output_dir, "enhanced_stacking_ensemble.joblib"), compress=3)
     logger.info(f"Models successfully trained and serialized into '{output_dir}'.")
 
     # Evaluate by Location for GBR and Enhanced Model
