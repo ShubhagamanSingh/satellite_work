@@ -1,0 +1,394 @@
+3.3 Embedded Approach of Feature Selection
+Data quality affects the performance of any machine learning model. Even the advance model 
+cannot perform well if the data is noisy (Hegazi et al., 2021). A SMAP-L4 dataset initially 
+contained 44 environmental variables (Appendix Table A1). To enhance soil moisture predictive 
+capacity, an embedded feature selection method based on RF regression was employed. An 
+exhaustive investigation into feature significance was conducted using the RF regressor, a robust 
+ensemble learning method that combines multiple decision trees to improve predictive accuracy. 
+Each decision tree was trained using the bootstrap aggregating (bagging) method, enhancing 
+generalization (Khaire & Dhanalakshmi, 2022). ‘L’ leaves on a decision tree split the feature space 
+into ‘L’ regions, denoted as 𝑅𝑙 for each region, where 1 ≤l≤ L. For a single tree, the function f(p) 
+for prediction is given as (Chen et al., 2020) 
+𝑓(𝑝) =
+𝐿
+𝑙
+𝑐𝑙µ(𝑥,𝑅𝑙)       (2)
+where ‘L’ is the number of regions in the feature space, ‘𝑅𝑙’ is a region appropriate to ‘l’ and
+‘𝑐𝑙’ is a constant suitable to l.
+µ(𝑥,𝑅𝑙) = 1       𝑖𝑓 𝑥€𝑅𝑙
+0      𝑜𝑡ℎ𝑒𝑟𝑤𝑖𝑠𝑒     (3)
+where µ(𝑥,𝑅𝑙) in Eq. 3 is an indicator function which tells that the specific feature falls in the 
+precise tree of the RF or not. The majority vote determines the final classification result.   The 
+objective of the embedded feature selection was to systematically identify the most influential 
+environmental parameters affecting surface soil moisture prediction. Initially, all the 44 features 
+present in the geophysical dataset were used to train the RF Regressor model. The importance 
+score of features was computed based on the Ginni importance criterion, which evaluates the 
+contribution of each feature towards reducing prediction error. RF is particularly effective in 
+handling high-dimensional datasets (Khaire & Dhanalakshmi, 2022). Thus, the most critical 
+features were selected to optimize model accuracy and computational efficiency (Chen et al., 
+2020). This approach effectively handles complex feature interactions and provides reliable 
+importance ranking (Motta et al., 2021). Redundant and non-informative features were 
+eliminated, retaining only significant predictors (Li et al., 2012). The RF model used for feature 
+selection employed default hyperparameters from the scikit-learn library, including 100 
+estimators (n_estimators = 100), no restriction on tree depth (max_depth = None), minimum two 
+samples required for a split (min_samples_split = 2), and square root feature sampling 
+(max_features = 'sqrt'). Random state was not set during feature selection to allow natural 
+randomness in tree formation. A schematic diagram of embedded feature selection method (Liu 
+et al., 2019) is shown in Fig. 2. Based on the calculated importance scores, the top 14 features 
+were selected. 
+
+--- PAGE 10 ---
+9
+              
+                                                Fig. 2.  Feature selection method. 
+The number 14 was finalized based on the importance score of features: selecting fewer than 
+14 features resulted in a noticeable decline in model performance, while selecting beyond 21 
+features did not yield significant gains as clearly shown in Fig. 3 which shows the low error 
+mean squared error (MSE) in model prediction when feature count is in between 14 to 21 and 
+greater otherwise.  The workflow of this feature selection process is shown in Fig. 2  and the 
+correlation between the selected features, and the surface soil moisture target variable is shown 
+in Fig. 4. It is important to note that although several input variables are related to moisture, they 
+represent distinct physical aspects of the land surface. For example, sm_rootzone looks at how 
+much moisture is present deeper in the soil (around 0–100 cm), while sm_surface only covers 
+the top layer (0–5 cm). The variables sm_surface_wetness and sm_rootzone_wetness don’t give 
+exact moisture levels but rather indicate how wet those layers generally are. While they might 
+sound similar, RF and correlation plots were checked and found that they weren’t overlapping. 
+Each one added something different to the model. The most significant 14 features are shown in 
+Table 2.
+Table 2 List of 14 Features selected for soil moisture prediction using Random Forest.
+Feature Name Description
+sm_surface_wetness Wetness condition at surface (0–5 cm)
+land_fraction_unsaturated Fraction of land area unsaturated by water
+Optimization procedure
+(Iterative tuning of feature 
+subset)
+Dataset with all 
+features
+(Raw Input Variables)
+Learning algorithm 
+with constraints
+Reduced dataset
+(Selected Key Features)
+
+--- PAGE 11 ---
+10
+sm_rootzone Soil moisture in rootzone (0–100 cm)
+overland_runoff_flux Rate of surface runoff over land
+precipitation_total_surface_flux Total precipitation reaching land surface
+windspeed_lowatmmodlay Near-surface wind speed (model surface layer)
+heat_flux_ground Heat fluxes between ground and atmosphere
+vegetation_greenness_fraction Fraction of green vegetation cover
+soil_temp_layer3 Soil temperature at 15–35 cm depth 
+soil_temp_layer5 Soil temperature at 60–100 cm depth 
+net_downward_longwave_flux Net incoming longwave radiation at land surface
+sm_rootzone_wetness Wetness condition in rootzone soil layer
+depth_to_water_table_from_surface_in_peat Depth from surface to water table in peatlands
+land_fraction_saturated Fraction of land area saturated with water
+
+--- PAGE 12 ---
+11
+Fig. 3. Variation in model error (MSE) with number of selected features.
+3.4 Gradient Boosting Regression for soil moisture prediction
+ The Gradient Boosting (GB) Regressor was employed to predict the surface soil moisture by 
+using the 14 important features selected through the RF embedded feature selection method. GBR 
+builds an ensemble model by sequentially adding decision trees, where each new tree minimizes 
+the residual errors made by the previous ensemble (Rao et al., 2019). It is a combined model with 
+enhanced stability and greater performance (Shrivastav & Jha, 2021). It uses the boosting 
+algorithm to solve the regression problem.  GBR minimizes a loss function using gradient descent 
+(Li et al., 2018). The prediction after adding M trees is mathematically represented as 
+𝑓𝑀(𝑥𝑗) = ∑𝑀𝑚𝑦𝑚ℎ𝑚(𝑥𝑗)    (4).
+where ℎ𝑚(𝑥𝑗) represents the prediction from the mth weak learner and 𝑦𝑚 is its weight.
+
+--- PAGE 13 ---
+12
+Fig. 4. Correlation value of highly important 14 features with sm_surface.
+The GBR model was implemented using the scikit-learn library (Pedregosa et al., 2011). 
+Hyperparameter tuning was systematically conducted using the GridSearchCV function. The 
+parameters optimization includes, number of trees (n_estimators = 100), learning rate 
+(learning_rate = 0.1), tree depth (max_depth = 3), and random state (random_state = 42). Fig. 5 
+shows the general architecture of the GBR model. Setting a shallow tree depth (max_depth = 3) 
+helped prevent overfitting, along with the benefit of feature selection in reducing model 
+complexity. The training and evaluation process followed an 80:20 split, where 80% of the 
+available data samples were used for training and 20% were used for testing. A single GBR model 
+was trained and tested on data of each seven locations (Bhuj, Idar, Ankleshwar, Bhavnagar, 
+Jamnagar, Vapi, and Palanpur) independently then additionally saved model on each location is 
+tested on different location data to cross validate model’s predictive ability. This cross-validation 
+step helped to confirm that the model works well even when applied to different environmental 
+conditions. Three common evaluation metrics, MSE, mean absolute error (MAE), and R-squared 
+(R²) were used to assess how well the model performed.
+3.5 Details of Implementation
+Linear Regression, Lasso, RF and GB were implemented in Google Colab with Python 3.8 and 
+scikit-learn version 0.24.2. The environment provided a consistent and accessible platform for 
+implementing and testing all models. GBR was tuned using GridSearchCV with 5-fold cross-
+validation. The final model used n_estimators = 100, learning_rate = 0.1, max_depth = 3, and 
+random_state = 42. RF Regressor  was tuned using n_estimators = 100 and max_depth = None 
+sm_surface_wetness
+land_fraction_unsatura...
+sm_rootzone
+land_fraction_saturate...
+overland_runoff_flux
+precipitation_total_su...
+windspeed_lowatmmodlay
+depth_to_water_table_f...
+soil_temp_layer5
+net_downward_longwave_...
+soil_temp_layer3
+heat_flux_ground
+vegetation_greenness_f...
+sm_rootzone_wetness
+0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+Correlation value
+
+--- PAGE 14 ---
+13
+(i.e., fully grown trees). For Lasso Regression regularization parameter alpha was determined via 
+built-in cross-validation to ensure optimal shrinkage without manual tuning. And Linear 
+Regression was implemented using default scikit-learn settings.dom_state = 42.
+Figure 5. Gradient Boosting Regressor model.
+4. Soil Moisture Prediction Process
+The model generation process for assessing soil moisture levels using the SMAP geophysical 
+dataset is explained as follows. The powerful GBR, which employs ensemble learning to measure 
+typical interdependency present in the data, is the foundation of the suggested prediction model. 
+Using weaker learning algorithms that have been separately taught from several models, the 
+ensemble machine learning algorithm combines the findings in some way, usually by averaging 
+all the predictions to produce an overall better prediction. This has proven to be effective, and a 
+lot of study in the field of ensemble learning has been done on it (Hegazi et al., 2021). It is highly 
+helpful to predict soil moisture when a subset of geophysical properties is chosen. When the 
+model's hyperparameters are set appropriately, the model's performance can potentially increase 
+dramatically. One technique for choosing a model's ideal hyperparameter is GridSearchCV 
+(Ahmad et al., 2022). A comprehensive approach is employed to maximize the GBR 
+
+--- PAGE 15 ---
+14
+hyperparameters, instead of choosing the estimators or random state values at random, 
+GridSearchCV's power is used to systematically identify the best suited values. After a thorough 
+investigation, it was concluded that 100 estimators and a random state value of 42 would make up 
+the optimal design. GridSearchCV enables us to explore a wide variety of hyperparameter 
+combinations in a time efficient manner, which helps to ensure that proposed model is 
+appropriately calibrated for the activity at hand. The utilized GridSearchCV methodology for 
+model training and hyperparameter selection demonstrated in Fig. 6 . The performance metrics 
+have been evaluated during the whole model-training process which are R2, MSE and MAE. These 
+measures offered helpful information on how well the model was able to absorb the data fed to it 
+during training. It is important to highlight that GBRs are resistant to overfitting by nature. 
+However, a very good balance between bias and variance is achieved in the suggested model by 
+carefully choosing the hyperparameters, as suggested by GridSearchCV. The suggested model 
+results, after these modifications, will provide accurate and dependable forecasts for the SMAP 
+soil moisture dataset. The trained model's strong prediction abilities are demonstrated by 
+evaluation metrics. A prediction accuracy metric supplied by MSE, where higher performance is 
+shown by lower numbers. R 2 metric also quantifies the percentage of variance in the objective 
+variable (soil moisture) that the model accounts for. Performance on the training dataset provides 
+a good starting point for the model's potential in the actual world.
+                                                                               
+Fig. 6. Tuning of hyperparameters using fivefold cross-validation (GridSearchCV).
+1st round
+2nd round
+Kth round
+ Kth score
+2nd score
+1st score
+1st round
+2nd round
+Kth round
+ Kth score
+2nd score
+1st score
+1st round
+2nd round
+Kth round
+ Kth score
+2nd score
+1st score
+1st
+hyperparameter
+combinat on
+2nd
+hyperparameter
+combinat on
+nth
+hyperparameter
+combinat on
+Average score
+of nth
+combinat on
+Average score
+of 1st
+combinat on
+Average score
+of 2nd
+combinat on
+Control Combinat on with highest
+Score
+Training Fold
+ Validat on Fold
+k-fold cross-validat on
+
+--- PAGE 16 ---
+15
+Basically, the MSE, R 2 and MAE are calculated using following expression (Chicco et al., 
+2021) 
+  𝑀𝑆𝐸 = 1
+𝑛 (𝑝𝑖 ― 𝑝)2    (5)
+where, 𝑝 = actual value of the target and 𝑝 = predicted value of the target.
+                                  
+𝑅2 =  𝑆𝑆𝑅
+𝑆𝑆𝑇 = ∑ (𝑝𝑖 ― 𝑝)2
+∑ (𝑝𝑖 ― 𝑝) 2     (6)
+where SSR represents the sum of squares regression and SST represents the sum of squares total.
+𝑀𝐴𝐸 = 1
+𝑛
+𝑛
+𝑖=1
+|𝑥𝑖 ― 𝑥|     (7)
+where, xi = predicted value of target and x = actual value of target. A completely trained version 
+of the model has been developed and saved as a file using the Python Pickle module, ensuring the 
+model's accessibility and practicality in real-world applications. It guarantees that the suggested 
+model's predictive ability can be applied to a range of activities concerning the estimation of 
+moisture content in soil. The workflow of the proposed model is presented in Fig. 7. A thorough 
+analysis has been done on the suggested model’s outcome to determine the moisture content in 
+soil, which was constructed using the SMAP geophysical dataset. Two key aspects are under 
+consideration: the relationship between features and their significance, as well as the efficacy of 
+the suggested model. In Fig. 8, the significance of characteristics is displayed. Among the features 
+that were selected, 'sm_rootzone,' 'sm_rootzone_wetness,' and 'zm_surface_wetness' stand have 
+high ratings. These scores show that these characteristics significantly affect predictions of soil 
+moisture. This finding emphasizes the significant contributions that these variables make to the 
+dynamics of soil moisture.  Making a feature association heatmap ( Fig. 9) encourages study into 
+the relationships between the several variables that were selected. There is little intercorrelation 
+among the input features, which is a positive sign for the suggested model's robustness. This 
+assessment covers seven different areas in Gujarat, each with its own climate. It enables us to offer 
+insightful information about the suggested model's capacity for prediction across a range of 
+geographical areas. In addition, the investigation covered important dates including January, 
+March, May, and August. Performance measures for every place and time point were carefully 
+evaluated, including MSE, MAE, and R 2. Table 3 displays, for each month throughout the four-
+year period, the average value of MSE, MAE, and R2 to give a more detailed view of the suggested 
+model’s performance. The remarkable consistency of these results across sites is indicative of the 
+
+--- PAGE 17 ---
+16
+resilience of the suggested model. Fig. 10 displays the overall model performance for four different 
+months of each year at seven different locations in Gujrat.
+Fig. 7.  Workflow of proposed model for soil moisture estimation.
+Table 3 The average value of MSE, MAE, and R2.
+Months MSE (m3/m3) MAE (m3/m3) R2 
+January 4.8880 ×10-05 0.0048 0.9972
+Step 1
+•Data collection (NASA SMAP dataset) 
+Step 2
+•Data Preprocessinig (Removing null values) and Imputing missing value in dataset
+Step 3
+•Embedded feature selection (Random Forest)
+Step 4
+•Hyperparamater tuning (Grid Search CV)
+Step 5
+•Cross-validation
+Step 6
+•Model training 
+Step 7
+•Model saving
+Step 8 •Model testing on unseen dataset
+
+--- PAGE 18 ---
+17
+March 4.7788 ×10-05 0.0047 0.9974
+May 5.2202 ×10-05 0.0049 0.9971
+August 5.3728 ×10-05 0.0050 0.9971
+                  
+               
+                  
+Fig 8. Importance score of features.
+0.07
+0.06
+0.05
+0.05
+0.06
+0.06
+0.06
+0.054
+0.04
+0.05
+0.04499
+0.03
+0.03
+Overland runoff flux
+Windspeed_lowatmmodlay
+Net downward longwave flux
+Heat flux ground
+Depth to water table from surface in peat
+Soil temp layer5
+Vegetation greenness fraction
+Soil temp layer3
+Land fraction saturated
+Land fraction unsaturated
+Precipitation total surface flux
+soil moisture at rootzone
+soil moiture wetness at surface
+
+--- PAGE 19 ---
+18
+ 
+ 
+Fig 9. 
+Correlation heatmap of selected feature. 
+5. Performance Analysis for Soil Moisture Prediction
+There are several additional models which are commonly known as Linear Regression, RF, 
+Regressor and Lasso Regression etc. These models are compared for analyzing the GBR 
+performance. It's evident that the GBR model gave the greatest results. In  Fig. 11 , all 
+methodologies' relative performance analysis is graphically displayed.  While RF showed 
+slightly lower MSE and MAE in some cases but both RF and GBR had comparable R² scores. 
+However, GBR has shown a significantly better balance between accuracy and resource usage. 
+During execution in Google Colab, RF has consumed about more than 10 GB of RAM just after 
+fewer iterations as number of trees increases and sometimes it leads to crashing of kernel due 
+resource exhaust while GB maintains accuracy as MSE of 4.8 × 10-5 m3/m3, MAE of 0.005 
+m3/m3, and R2 of 0.99 m3/m3 with consummation of RAM below 8 GB always which proved it 
+better in terms of accuracy and computational efficiency.
+
+--- PAGE 20 ---
+19
+Fig 10.  Performance of the proposed model in seven different locations.
+
+--- PAGE 21 ---
+20
+                                   
+Fig. 11 (a)-(c) Comparative performance analysis of GBR and other regression methods.
+Nevertheless, the GBR approach is flexible and dependable. By carefully adjusting the 
+hyperparameters and carrying out real-world tests, the model's adaptability is shown, enabling it 
+to meet the challenges of soil moisture prediction. These performance criteria confirm the GBR 
+model's usefulness and establish it as an indispensable instrument for environmental monitoring, 
+decision-making, and future study.
+
+--- PAGE 22 ---
+21
+Fig. 12 Soil moisture prediction performance of GBR for (a) Bhuj, (b) Idar, (c) Ankleshwar, (d) 
+Bhavnagar, (e) Jamnagar, and (f) Vapi. 
+The trained GBR model has been tested on all selected seven locations for the new dataset and 
+the accuracy plot for actual verses predicted value of the soil moisture is being plotted ( Figs. 12 
+(a)-(f)). It has been noticeable for all the locations that model has performed exceptionally well 
+for all the dataset by predicting the values very near to the actual value of the moisture content of 
+(a)
+ (b)
+(c)
+ (d)
+(e)
+ (f)
+
+--- PAGE 23 ---
+22
+soil.  The level to which the model's predictions and actual values diverge is shown by points that 
+deviate from the diagonal line. Points below the line indicate underestimate, while points above 
+the line indicate overestimation by the model. When values fall on the diagonal line, it means that 
+the moisture content value of soil is same for both actual and predicted values. The degree to which 
+the model's predictions and actual values diverge is shown by points in Figs. 12 (a)-(f) that deviate 
+from the diagonal line. The maximum divergence in actual values and predicted values is noticed 
+for soil moisture between 0.2-0.6 for all locations. While the accuracy of prediction is higher for 
+lower < 0.2 and higher > 0.2 soil moisture. On the basis of visual analysis, it is obvious that the 
+maximum divergence is noticed in the prediction of moisture content of soil for Bhuj (Fig. 12 (a)) 
+and the minimum divergence is achieved for Idar (Fig. 12 (b)) and Vapi (Fig. 12 (f)). There are a 
+few observations in each of the datasets for which actual and predicted values of soil moisture 
+deviate significantly. 
+If the prediction performance of the method for the locations Bhuj ( Fig. 12 (a), Ankleshwar 
+(Fig. 12 (c)) and Jamnagar (Fig. 12 (e)) is observed closely, it has been seen that there is maximum 
+divergence in between 0.2-0.6 than the other four locations ( Fig. 12 (b), Fig. 12 (d), and Fig. 12 
+(f)). It is due to the unpredictable weather pattern at these locations which the model fails to 
+accurately predict the moisture content of soil value near to the actual value. The same which the 
+model has shown has also been mentioned in the official website of Indian Meteorological 
+Department (Bentéjac et al., 2021) for these locations that these locations have the unpredictable 
+weather pattern. 

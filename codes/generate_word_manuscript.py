@@ -22,7 +22,11 @@ from docx.oxml.ns import nsdecls, qn
 
 def get_fig_path(fig_name):
     """Finds figure path across possible locations."""
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.abspath(os.path.join(script_dir, ".."))
     candidates = [
+        os.path.join(parent_dir, "figures", fig_name),
+        os.path.join(script_dir, "figures", fig_name),
         os.path.join("figures", fig_name),
         os.path.join(r"e:\E2\Research\Main_Project\figures", fig_name),
         os.path.join(r"e:\E2\Research\figures", fig_name)
@@ -623,9 +627,13 @@ def build_paper(output_path="Enhanced_Soil_Moisture_Prediction_Paper.docx"):
         run_r = p_r.add_run(r)
         run_r.font.size = Pt(9)
 
+    os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
     doc.save(output_path)
     print(f"Successfully generated Word manuscript: {output_path} (Size: {os.path.getsize(output_path)} bytes)")
 
 if __name__ == "__main__":
-    out_file = sys.argv[1] if len(sys.argv) > 1 else "Enhanced_Soil_Moisture_Prediction_Paper.docx"
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.abspath(os.path.join(script_dir, ".."))
+    default_out = os.path.join(parent_dir, "docs", "Enhanced_Soil_Moisture_Prediction_Paper.docx") if os.path.basename(script_dir) == "codes" else os.path.join("docs", "Enhanced_Soil_Moisture_Prediction_Paper.docx")
+    out_file = sys.argv[1] if len(sys.argv) > 1 else default_out
     build_paper(out_file)
