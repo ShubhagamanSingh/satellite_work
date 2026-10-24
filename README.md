@@ -42,9 +42,11 @@ satellite_work/
 │   ├── plot_generator.py                        # 300 DPI publication figure generator (Figs 1–14)
 │   ├── download_real_smap_granules.py           # NASA Earthdata Cloud downloader via earthaccess
 │   ├── generate_ieee_manuscript.py              # Publication IEEE Word manuscript builder (.docx) with all 14 figures
+│   ├── generate_literature_review_doc.py        # Dedicated IEEE Literature Review Word manuscript generator
 │   ├── generate_word_manuscript.py              # Word manuscript (.docx) builder with embedded charts
 │   └── __init__.py
 ├── docs/                                        # Manuscripts, documentation & reference literature
+│   ├── Literature_Review_Section.docx           # Standalone publication-ready Literature Review section (IEEE 2-column)
 │   ├── Enhanced_Soil_Moisture_Prediction_Paper_IEEE.docx # Publication-grade IEEE Word manuscript (with all 14 figures & tables)
 │   ├── Enhanced_Soil_Moisture_Prediction_Paper.docx # Publication-grade Word manuscript (with all 14 figures)
 │   ├── RESEARCH_PAPER_DOCUMENTATION.md          # Comprehensive scientific and mathematical documentation
@@ -149,7 +151,8 @@ python run_pipeline.py --offline
 ## 📚 Documentation Index
 
 For in-depth explanations and research documentation, consult the files in [`docs/`](docs/):
-* **[`docs/Enhanced_Soil_Moisture_Prediction_Paper_IEEE.docx`](docs/Enhanced_Soil_Moisture_Prediction_Paper_IEEE.docx):** Ready-to-submit IEEE-format Word manuscript containing all original paper content, all improvements and their physical needs, explicit quantitative accuracy differences, all 14 figures, and formatted tables.
+* **[`docs/Literature_Review_Section.docx`](docs/Literature_Review_Section.docx):** Dedicated standalone IEEE 2-column Word document containing only the Literature Review section with synthesis tables and complete benchmarking against Singh et al. (2025).
+* **[`docs/Enhanced_Soil_Moisture_Prediction_Paper_IEEE.docx`](docs/Enhanced_Soil_Moisture_Prediction_Paper_IEEE.docx):** Ready-to-submit IEEE-format Word manuscript containing all original paper content, literature review, all improvements and their physical needs, explicit quantitative accuracy differences, all 14 figures, and formatted tables.
 * **[`docs/Enhanced_Soil_Moisture_Prediction_Paper.docx`](docs/Enhanced_Soil_Moisture_Prediction_Paper.docx):** Publication Word manuscript with all 14 figures, formal equations, and formatted tables.
 * **[`docs/RESEARCH_PAPER_DOCUMENTATION.md`](docs/RESEARCH_PAPER_DOCUMENTATION.md):** Exhaustive academic breakdown, math derivations, and full 44-variable schema.
 * **[`docs/CONCEPTUAL_EXPLANATION_GUIDE.md`](docs/CONCEPTUAL_EXPLANATION_GUIDE.md):** Non-technical guide using sponge, coffee filter, and medical board analogies.
